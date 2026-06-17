@@ -1,0 +1,53 @@
+# ============================================================
+# HIS 백엔드 팀 공통 설정 (Git 커밋용)
+# 개인 PC만 다른 값이 필요하면 application-local.yml 사용
+# ============================================================
+
+server:
+  port: 8081
+
+app:
+  # 프론트 .env.local 의 NEXT_PUBLIC_API_URL 과 동일하게 맞출 것
+  api:
+    host: localhost
+    port: ${server.port}
+    base-url: http://${app.api.host}:${server.port}
+    endpoints:
+      menus: /api/menus
+      staff: /admin/staff
+
+  # 프론트 Next.js 개발 서버 (CORS 허용 Origin)
+  cors:
+    allowed-origin-patterns:
+      - http://localhost:3000
+      - http://127.0.0.1:3000
+
+spring:
+  config:
+    import: optional:classpath:application-local.yml
+  datasource:
+    # Oracle XE — Menu(MyBatis), Staff(JPA) 공용 (팀 공용 DB 서버)
+    url: jdbc:oracle:thin:@192.168.1.128:1521:XE
+    username: hospital
+    password: "1111"
+    driver-class-name: oracle.jdbc.OracleDriver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+# SeaweedFS Filer API (S3 8333 말고 Filer 8888 사용 — 실제 파일 저장·조회)
+# 팀 공용: SuGeun PC(192.168.1.128)에서 SeaweedFS Filer 실행 + 방화벽 8888 허용
+# SeaweedFS 돌리는 PC에서 백엔드도 같이 돌릴 때는 application-local.yml 에 localhost:8888 로 override
+seaweedfs:
+  filer:
+    endpoint: http://192.168.1.128:8888
+    bucket: emp_photo

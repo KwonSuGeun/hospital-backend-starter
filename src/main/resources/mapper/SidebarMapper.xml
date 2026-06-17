@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hospital.sidebar.mapper.SidebarMapper">
+
+    <select id="selectSidebarMenuRows" resultType="com.hospital.sidebar.dto.SidebarMenuRowDto">
+        SELECT
+            MENU_ID   AS id,
+            PARENT_ID AS parentId,
+            NAME      AS label,
+            PATH      AS path
+        FROM HOSPITAL.AUTH_MENU
+        WHERE IS_ACTIVE = 'Y'
+        ORDER BY SORT_ORDER
+    </select>
+
+</mapper>
