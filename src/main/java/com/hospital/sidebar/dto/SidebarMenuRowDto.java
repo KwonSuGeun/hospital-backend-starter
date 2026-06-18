@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * MyBatis 조회 결과 row — parentId로 트리 조합 후 SidebarNodeDto로 변환
+ * MyBatis 조회 결과 row — GET /api/sidebar flat 응답 (트리 조합은 프론트)
  */
 @Getter
 @Setter

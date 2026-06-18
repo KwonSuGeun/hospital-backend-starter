@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
 /**
- * MyBatis Mapper — AUTH_MENU flat 조회 (SidebarServiceImpl.buildTree 입력)
+ * MyBatis Mapper — AUTH_MENU flat 조회 (GET /api/sidebar)
  */
 @Mapper
 public interface SidebarMapper {

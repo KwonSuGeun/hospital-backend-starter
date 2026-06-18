@@ -7,6 +7,7 @@ import com.hospital.staff.dto.StaffDetailDto;
 import com.hospital.staff.dto.StaffDto;
 import com.hospital.staff.entity.Department;
 import com.hospital.staff.entity.Staff;
+import com.hospital.staff.mapper.StaffMapper;
 import com.hospital.staff.repository.DepartmentRepository;
 import com.hospital.staff.repository.StaffRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,19 +39,14 @@ public class StaffServiceImpl implements StaffService {
     private final StaffRepository staffRepository;
     private final DepartmentRepository departmentRepository;
     private final SeaweedFsService seaweedFsService;
+    private final StaffMapper staffMapper;
 
     // --- [목록] ---
     @Override
     @Transactional(readOnly = true)
     public List<StaffDto> getStaffList() {
         List<Staff> staffList = staffRepository.findAll();
-
-        List<StaffDto> result = new ArrayList<>();
-        for (Staff staff : staffList) {
-            StaffDto dto = toDto(staff);
-            result.add(dto);
-        }
-        return result;
+        return staffMapper.toDtoList(staffList);
     }
 
     // --- [상세] ---
@@ -60,7 +55,7 @@ public class StaffServiceImpl implements StaffService {
     public StaffDetailDto getStaff(String id) {
         Staff staff = staffRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("staff Error"));
-        return toDetailDto(staff);
+        return staffMapper.toDetailDto(staff);
     }
 
     // --- [등록 폼] 부서 목록 ---
@@ -68,12 +63,7 @@ public class StaffServiceImpl implements StaffService {
     @Transactional(readOnly = true)
     public List<DepartmentDto> getDepartmentList() {
         List<Department> departments = departmentRepository.findByIsActiveOrderById("Y");
-
-        List<DepartmentDto> result = new ArrayList<>();
-        for (Department department : departments) {
-            result.add(toDepartmentDto(department));
-        }
-        return result;
+        return staffMapper.toDepartmentDtoList(departments);
     }
 
     // --- [등록] ---
@@ -96,26 +86,14 @@ public class StaffServiceImpl implements StaffService {
             photoKey = seaweedFsService.uploadStaffPhoto(request.getStaffNo(), photo);
         }
 
-        Staff staff = new Staff();
-        staff.setId(request.getStaffNo());
-        staff.setPassword(request.getPassword());
-        staff.setName(request.getName());
-        staff.setStaffType(request.getStaffType());
-        staff.setStaffRoleCode(ROLE_CODE_BY_TYPE.get(request.getStaffType()));
+        Staff staff = staffMapper.toEntity(request);
         staff.setDepartment(department);
-        staff.setStaffRankCode(request.getStaffRankCode());
-        staff.setStaffPositionCode(emptyToNull(request.getStaffPositionCode()));
-        staff.setStaffPhone(request.getStaffPhone());
-        staff.setStaffExtensionNo(emptyToNull(request.getStaffExtensionNo()));
-        staff.setEmail(emptyToNull(request.getEmail()));
-        staff.setHireDate(request.getHireDate());
+        staff.setStaffRoleCode(ROLE_CODE_BY_TYPE.get(request.getStaffType()));
         staff.setStaffStatus(STAFF_STATUS_ACTIVE);
-        staff.setBirthDate(request.getBirthDate());
-        staff.setAddress(emptyToNull(request.getAddress()));
         staff.setStaffPhotoKey(photoKey);
 
         Staff savedStaff = staffRepository.save(staff);
-        return toDto(savedStaff);
+        return staffMapper.toDto(savedStaff);
     }
 
     @Override
@@ -148,50 +126,5 @@ public class StaffServiceImpl implements StaffService {
                 // SeaweedFS 삭제 실패 시 DB 삭제는 유지
             }
         }
-    }
-
-    // --- 내부 헬퍼 / DTO 변환 ---
-    private String emptyToNull(String value) {
-        if (!StringUtils.hasText(value)) {
-            return null;
-        }
-        return value.trim();
-    }
-
-    private StaffDto toDto(Staff staff) {
-        StaffDto dto = new StaffDto();
-        dto.setId(staff.getId());
-        dto.setName(staff.getName());
-        dto.setEmail(staff.getEmail());
-        dto.setDepartmentName(staff.getDepartmentName());
-        if (StringUtils.hasText(staff.getStaffPhotoKey())) {
-            dto.setPhotoUrl("/api/staff/" + staff.getId() + "/photo");
-        }
-        return dto;
-    }
-
-    private StaffDetailDto toDetailDto(Staff staff) {
-        StaffDetailDto dto = new StaffDetailDto();
-        dto.setId(staff.getId());
-        dto.setName(staff.getName());
-        dto.setDepartmentName(staff.getDepartmentName());
-        dto.setStaffType(staff.getStaffType());
-        dto.setStaffRankCode(staff.getStaffRankCode());
-        dto.setStaffPositionCode(staff.getStaffPositionCode());
-        dto.setStaffPhone(staff.getStaffPhone());
-        dto.setStaffExtensionNo(staff.getStaffExtensionNo());
-        dto.setEmail(staff.getEmail());
-        dto.setHireDate(staff.getHireDate());
-        dto.setStaffStatus(staff.getStaffStatus());
-        dto.setBirthDate(staff.getBirthDate());
-        dto.setAddress(staff.getAddress());
-        return dto;
-    }
-
-    private DepartmentDto toDepartmentDto(Department department) {
-        DepartmentDto dto = new DepartmentDto();
-        dto.setDepartmentId(department.getId());
-        dto.setDepartmentName(department.getName());
-        return dto;
     }
 }

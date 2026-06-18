@@ -1,7 +1,7 @@
 package com.hospital.sidebar.controller;
 
 import com.hospital.common.ApiResponse;
-import com.hospital.sidebar.dto.SidebarNodeDto;
+import com.hospital.sidebar.dto.SidebarMenuRowDto;
 import com.hospital.sidebar.service.SidebarService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * Sidebar REST API — /api/sidebar
- * 프론트: sidebarApi.ts → sidebarSaga.ts → sidebar.tsx
+ * 프론트: sidebarApi.ts → buildSidebarTree → sidebarSaga.ts → sidebar.tsx
  */
 @RestController
 @RequestMapping("/api/sidebar")
@@ -21,9 +21,9 @@ public class SidebarController {
 
     private final SidebarService sidebarService;
 
-    // --- [메뉴 트리] GET /api/sidebar ---
+    // --- [메뉴] GET /api/sidebar — flat row (parentId 포함) ---
     @GetMapping
-    public ApiResponse<List<SidebarNodeDto>> getSidebarTree() {
-        return ApiResponse.success(sidebarService.getSidebarTree());
+    public ApiResponse<List<SidebarMenuRowDto>> getSidebarMenuRows() {
+        return ApiResponse.success(sidebarService.getSidebarMenuRows());
     }
 }

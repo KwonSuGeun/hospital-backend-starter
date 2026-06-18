@@ -1,6 +1,6 @@
 package com.hospital.sidebar.service;
 
-import com.hospital.sidebar.dto.SidebarNodeDto;
+import com.hospital.sidebar.dto.SidebarMenuRowDto;
 
 import java.util.List;
 
@@ -9,5 +9,5 @@ import java.util.List;
  */
 public interface SidebarService {
 
-    List<SidebarNodeDto> getSidebarTree();
+    List<SidebarMenuRowDto> getSidebarMenuRows();
 }
