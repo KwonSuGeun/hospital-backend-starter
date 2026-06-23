@@ -5,6 +5,12 @@
 
 server:
   port: 8081
+  servlet:
+    session:
+      cookie:
+        # Next.js(3000) ↔ Spring(8081) cross-origin 세션 쿠키 전송
+        same-site: none
+        secure: true
 
 app:
   # 프론트 .env.local 의 NEXT_PUBLIC_API_URL 과 동일하게 맞출 것
