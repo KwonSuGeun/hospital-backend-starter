@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>병원시스템 Actor-Component Canvas</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 24px; }
+  h1 { text-align: center; margin-bottom: 8px; color: #1a1a2e; }
+  .sub { text-align: center; color: #666; margin-bottom: 24px; font-size: 14px; }
+  .stats { display: flex; gap: 16px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
+  .stat { background: white; border-radius: 8px; padding: 12px 24px; box-shadow: 0 2px 8px rgba(0,0,0,.08); text-align: center; }
+  .stat b { font-size: 24px; color: #2E75B6; display: block; }
+  .canvas { max-width: 1200px; margin: 0 auto; }
+  .root { background: #1a1a2e; color: white; text-align: center; padding: 16px; border-radius: 12px; font-size: 18px; font-weight: bold; margin-bottom: 16px; }
+  .pillars { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  @media(max-width:900px) { .pillars { grid-template-columns: 1fr; } }
+  .pillar { border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,.1); }
+  .pillar-hd { padding: 12px 16px; font-weight: bold; font-size: 15px; color: white; }
+  .clinical .pillar-hd { background: #548235; }
+  .support .pillar-hd { background: #BF8F00; }
+  .admin .pillar-hd { background: #C55A11; }
+  .pillar-bd { background: white; padding: 12px; }
+  .area { margin-bottom: 12px; }
+  .area-title { font-size: 12px; font-weight: bold; color: #888; margin-bottom: 6px; text-transform: uppercase; }
+  .actor { border-radius: 8px; padding: 8px 12px; margin-bottom: 6px; font-size: 13px; border-left: 4px solid; }
+  .actor-id { font-size: 11px; color: #666; }
+  .actor-name { font-weight: 600; }
+  .actor-comp { font-size: 11px; color: #888; }
+  .core { background: #D9E2F3; border-color: #2E75B6; margin-bottom: 16px; border-radius: 12px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,.1); }
+  .core-hd { font-weight: bold; color: #2E75B6; margin-bottom: 12px; font-size: 15px; }
+  .core-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(200px,1fr)); gap: 8px; }
+  .clinical .actor { background: #E2EFDA; border-color: #548235; }
+  .support .actor { background: #FFF2CC; border-color: #BF8F00; }
+  .admin .actor { background: #FCE4D6; border-color: #C55A11; }
+  .core .actor { background: white; border-color: #2E75B6; }
+  .system { background: #EDEDED; border: 2px dashed #999; border-radius: 8px; padding: 10px; text-align: center; font-size: 13px; margin-top: 12px; }
+  .legend { display: flex; gap: 16px; justify-content: center; margin-top: 20px; flex-wrap: wrap; font-size: 12px; }
+  .leg { display: flex; align-items: center; gap: 6px; }
+  .leg-box { width: 16px; height: 16px; border-radius: 3px; }
+  .arrow { text-align: center; color: #999; font-size: 20px; margin: 4px 0; }
+</style>
+</head>
+<body>
+<h1>Hospital Core Canvas</h1>
+<p class="sub">Functional Actor (기능 경계) × Component × Use Case — 직종 Actor 제거</p>
+<div class="stats">
+  <div class="stat"><b>56</b>Functional Actor</div>
+  <div class="stat"><b>187</b>Active UC</div>
+  <div class="stat"><b>+19</b>신규 UC</div>
+  <div class="stat"><b>-14</b>Phase2 제외</div>
+  <div class="stat"><b>18</b>Staff Role</div>
+</div>
+<div class="canvas">
+  <div class="root">[최상위] 병원 공통 Hospital Core</div>
+  <div class="core">
+    <div class="core-hd">공통基盤 — Cross-cutting</div>
+    <div class="core-grid">
+      <div class="actor"><div class="actor-id">ACT-F001~002 / S01</div><div class="actor-name">인증·권한·시스템연동</div><div class="actor-comp">로그인/세션 · 권한검증 · MSA Event</div></div>
+      <div class="actor"><div class="actor-id">ACT-F010~013</div><div class="actor-name">환자마스터·MPI</div><div class="actor-comp">등록 · 보험 · 이력 · 중복병합</div></div>
+      <div class="actor"><div class="actor-id">ACT-F100~104</div><div class="actor-name">시스템관리·통합알림</div><div class="actor-comp">코드 · RBAC · 감사 · 알림</div></div>
+      <div class="actor"><div class="actor-id">ACT-F110</div><div class="actor-name">운영대시보드</div><div class="actor-comp">금일운영 · 대기 · 병상 · 수술실</div></div>
+    </div>
+  </div>
+  <div class="pillars">
+    <div class="pillar clinical">
+      <div class="pillar-hd">진료 Clinical</div>
+      <div class="pillar-bd">
+        <div class="area"><div class="area-title">오더 Order</div>
+          <div class="actor"><div class="actor-id">ACT-F020~023</div><div class="actor-name">외래예약 · 당일접수 · 진료대기 · 응급접수</div></div>
+          <div class="actor"><div class="actor-id">ACT-F030~032</div><div class="actor-name">외래진료 · CPOE · 입원경과</div></div>
+          <div class="actor"><div class="actor-id">ACT-F080~084</div><div class="actor-name">입원 · 병상 · ADT</div></div>
+        </div>
+        <div class="area"><div class="area-title">케어 Care</div>
+          <div class="actor"><div class="actor-id">ACT-F033~034</div><div class="actor-name">간호기록 · 동의서</div></div>
+          <div class="actor"><div class="actor-id">ACT-F090~093</div><div class="actor-name">수술일정 · 수술기록 · 마취</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="pillar support">
+      <div class="pillar-hd">진료지원 Support</div>
+      <div class="pillar-bd">
+        <div class="area"><div class="area-title">약무</div>
+          <div class="actor"><div class="actor-id">ACT-F060~063</div><div class="actor-name">처방전 · 조제 · DUR · 재고</div></div>
+        </div>
+        <div class="area"><div class="area-title">기술</div>
+          <div class="actor"><div class="actor-id">ACT-F040~044</div><div class="actor-name">검사오더 · 임상 · 병리 · 기능 · 수혈</div></div>
+          <div class="actor"><div class="actor-id">ACT-F050~053</div><div class="actor-name">영상촬영 · 저장 · 판독 · 임상조회</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="pillar admin">
+      <div class="pillar-hd">행정 Administration</div>
+      <div class="pillar-bd">
+        <div class="area"><div class="area-title">원무 Front</div>
+          <div class="actor"><div class="actor-id">ACT-F070~076</div><div class="actor-name">수납 · 청구 · DRG · 제증명 · 검진</div></div>
+          <div class="actor"><div class="actor-id">ACT-F111~112</div><div class="actor-name">통계 · 경영지표</div></div>
+        </div>
+        <div class="area"><div class="area-title">지원 Back</div>
+          <div class="actor"><div class="actor-id">ACT-F003~006</div><div class="actor-name">직원 · 계정 · 스케줄</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="system">G01 세션주체 (Staff) ──Role──▶ Functional Actor 접근<br><small>의사·간호사·원무직원 = Staff 직종 (Actor 아님)</small></div>
+  <div class="legend">
+    <div class="leg"><div class="leg-box" style="background:#D9E2F3"></div>병원공통</div>
+    <div class="leg"><div class="leg-box" style="background:#E2EFDA"></div>진료</div>
+    <div class="leg"><div class="leg-box" style="background:#FFF2CC"></div>진료지원</div>
+    <div class="leg"><div class="leg-box" style="background:#FCE4D6"></div>행정</div>
+    <div class="leg"><div class="leg-box" style="background:#FFCCCC"></div>신규 UC</div>
+    <div class="leg"><div class="leg-box" style="background:#D9D9D9"></div>Phase2 제외</div>
+  </div>
+</div>
+</body></html>
